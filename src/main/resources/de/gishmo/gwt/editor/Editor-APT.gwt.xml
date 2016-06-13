@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  When updating your version of GWT, you should also update this DTD reference,
+  so that your app can take advantage of the latest GWT module capabilities.
+-->
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.7.0//EN"
+  "http://gwtproject.org/doctype/2.7.0/gwt-module.dtd">
+<module>
+  <!-- Inherit the core Web Toolkit stuff.                        -->
+  <inherits name='com.google.gwt.user.User'/>
+
+
+  <!--&lt;!&ndash; We need the JUnit module in the main module,               &ndash;&gt;-->
+  <!--&lt;!&ndash; otherwise eclipse complains (Google plugin bug?)           &ndash;&gt;-->
+  <!--&lt;!&ndash;<inherits name='com.google.gwt.junit.JUnit' /> &ndash;&gt;-->
+
+
+
+  <!--&lt;!&ndash; Other module inherits                                      &ndash;&gt;-->
+  <!--&lt;!&ndash;<inherits name="com.google.gwt.logging.LoggingDisabled"/>&ndash;&gt;-->
+  <!--<inherits name='com.mvp4g.Mvp4gModule'/>-->
+
+  <!--<inherits name="de.gothaer.gwt.core.Core"/>-->
+  <!--<inherits name="de.gothaer.gwt.gxt.ui.GothaerGXT"/>-->
+  <!--<inherits name="de.gothaer.gwt.gxt.config.Config"/>-->
+  <!--<inherits name="de.gothaer.gwt.taa.core.TaaCore"/>-->
+  <!--<inherits name="de.gothaer.gwt.configuration.Configuration"/>-->
+  <!--<inherits name="de.gothaer.gwt.taa.services.gewerbe.TaaGewerbeServices"/>-->
+  <!--<inherits name="de.gothaer.gwt.tooltip.ToolTip"/>-->
+  <!--<inherits name="de.gothaer.gwt.utils.Utils"/>-->
+
+  <!--<inherits name="de.gothaer.taa.gewerbe.config.ConfigModel"/>-->
+  <!--<inherits name="de.gothaer.taa.gewerbe.token.Token"/>-->
+  <!--<inherits name="de.gothaer.taa.gewerbe.ui.UiModel"/>-->
+
+  <!--<inherits name="org.fusesource.restygwt.RestyGWT"/>-->
+
+  <!--<inherits name="org.gwt4e.sema4g.SeMa4g"/>-->
+  <!--<inherits name="org.gwt4e.sema4g.resty.SeMa4gResty"/>-->
+
+  <!--&lt;!&ndash; GXT Stylesheet &ndash;&gt;-->
+  <!--<stylesheet src="reset.css" />-->
+  <!--&lt;!&ndash; Inherit the GXT style sheet.                               &ndash;&gt;-->
+  <!--<inherits name='de.gothaer.gxt.theme.taa.Theme'/>-->
+
+
+  <!--&lt;!&ndash; Specify the app entry point class.                         &ndash;&gt;-->
+  <!--<entry-point class='de.gothaer.gwt.taa.gewerbe.client.TaaGewerbe'/>-->
+
+
+  <!-- Specify the paths for translatable code                    -->
+  <source path='client'/>
+
+  <!--&lt;!&ndash; German language, independent of country &ndash;&gt;-->
+  <!--<extend-property name='locale' values='de'/>-->
+  <!--<set-property-fallback name="locale" value="de"/>-->
+
+  <!--&lt;!&ndash; GZip the output &ndash;&gt;-->
+  <!--<inherits name="com.google.gwt.precompress.Precompress"/>-->
+
+  <!--&lt;!&ndash; Deferred Binding rules                                     &ndash;&gt;-->
+
+  <!--&lt;!&ndash; Desktop                                                    &ndash;&gt;-->
+  <!--&lt;!&ndash; Frame                                                      &ndash;&gt;-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.view.buttonbar.ButtonBarView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.presenter.buttonbar.IButtonBarView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.view.content.ContentView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.presenter.content.IContentView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.view.header.HeaderView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.presenter.header.IHeaderView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.view.navigation.NavigationView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.presenter.navigation.INavigationView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.view.shell.ShellView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.presenter.shell.IShellView"/>-->
+  <!--</replace-with>-->
+
+  <!--&lt;!&ndash; Desktop                                                    &ndash;&gt;-->
+  <!--&lt;!&ndash; Modulbox                                                   &ndash;&gt;-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.view.shell.editor.MbMessageView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.frame.presenter.shell.editor.IMbMessageView"/>-->
+  <!--</replace-with>-->
+
+  <!--&lt;!&ndash; Business                                                   &ndash;&gt;-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.allgemein.AllgemeinView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.allgemein.IAllgemeinView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.antragsfragen.AntragsfragenView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.antragsfragen.IAntragsfragenView"/>-->
+  <!--</replace-with>-->
+
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.partnerdaten.beitragszahler.BeitragszahlerView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.partnerdaten.beitragszahler.IBeitragszahlerView"/>-->
+  <!--</replace-with>-->
+
+  <!--&lt;!&ndash;   <replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.personendaten.beitragszahler.container.MbHausanschriftView"> &ndash;&gt;-->
+  <!--&lt;!&ndash;     <when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.personendaten.beitragszahler.container.IMbHausanschriftView"/> &ndash;&gt;-->
+  <!--&lt;!&ndash;   </replace-with> &ndash;&gt;-->
+
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.personendaten.beitragszahler.MbBeitragszahlerView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.personendaten.beitragszahler.IMbBeitragszahlerView"/>-->
+  <!--</replace-with>-->
+
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.personendaten.partner.MbPartnerView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.personendaten.partner.IMbPartnerView"/>-->
+  <!--</replace-with>-->
+
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.partnerdaten.partner.PartnerView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.partnerdaten.partner.IPartnerView"/>-->
+  <!--</replace-with>-->
+
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.personendaten.versicherungsnehmer.MbVersicherungsnehmerView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.personendaten.versicherungsnehmer.IMbVersicherungsnehmerView"/>-->
+  <!--</replace-with>-->
+
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.tarifangaben.bhv.BetriebshaftpflichtView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.tarifangaben.bhv.IBetriebshaftpflichtView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.tarifangaben.inhalt.InhaltView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.tarifangaben.inhalt.IInhaltView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.abschluss.AbschlussView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.abschluss.IAbschlussView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.ergebnis.ErgebnisView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.ergebnis.IErgebnisView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.tarifangaben.gebaeude.GebaeudeView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.tarifangaben.gebaeude.IGebaeudeView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.gevo.aenderung.GevoAenderungConfigView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.gevo.aenderung.IGevoAenderungConfig"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.gevo.neu.TaaGevoNeuConfigView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.gevo.neu.ITaaGevoNeuConfig"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.gevo.neu.TrGevoNeuConfigView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.gevo.neu.ITrGevoNeuConfig"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.risikoort.RisikoOrtView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.risikoort.IRisikoOrt"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.tarifkonfiguration.TarifKonfigurationView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.tarifkonfiguration.ITarifKonfigurationView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.verkaufsprodukt.VerkaufsProduktSelectorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.verkaufsprodukt.IVerkaufsProduktSelectorView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.partnerdaten.versicherungsnehmer.VersicherungsnehmerView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.partnerdaten.versicherungsnehmer.IVersicherungsnehmerView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.view.zeichnung.ZeichnungsEntscheidungView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.mvp.presenter.zeichnung.IZeichnungsEntscheidungView"/>-->
+  <!--</replace-with>-->
+
+
+  <!--&lt;!&ndash; Modulboxen - Business                                                   &ndash;&gt;-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.allgemein.MbAllgemeinView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.allgemein.IMbAllgemeinView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.antragsfragen.vorschaden.MbVorschadenView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.antragsfragen.vorschaden.IMbVorschadenView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.antragsfragen.vorschaden.editor.MbVorschadenEditorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.antragsfragen.vorschaden.editor.IMbVorschadenEditorView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.ergebnis.MbErgebnisView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.ergebnis.IMbErgebnisView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.produktauswahl.editor.MbProduktAuswahlEditorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.produktauswahl.editor.IMbProduktAuswahlEditorView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.produktauswahl.MbProduktAuswahlView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.produktauswahl.IMbProduktAuswahlView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.risikoort.editor.MbRisikoOrtEditorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.risikoort.editor.IMbRisikoOrtEditorView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.risikoort.MbRisikoOrtView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.risikoort.IMbRisikoOrtView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.bhv.angaben.editor.MbAngabenBhvEditorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.bhv.angaben.editor.IMbAngabenBhvEditorView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.bhv.angaben.MbAngabenBhvView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.bhv.angaben.IMbAngabenBhvView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.bhv.privat.MbMvpPrivatBhvView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.bhv.privat.IMbMvpPrivatBhvView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.bhv.risikomerkmale.MbRisikomerkmaleBhvView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.bhv.risikomerkmale.IMbRisikomerkmaleBhvView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.gebaeude.risikoortauswahl.MbRisikoOrtAuswahlView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.gebaeude.risikoortauswahl.IMbRisikoOrtAuswahl"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.gebaeude.versicherungsumfang.editor.MbRisikoOrtAuswahlEditorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.gebaeude.versicherungsumfang.editor.IMbRisikoOrtAuswahlEditorView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.gebaeude.versichertegebaeude.MbVersichertegebaeudeView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.gebaeude.versichertegebaeude.IMbVersicherteGebaeudeView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.gebaeude.versichertegebaeude.editor.MbVersichertegebaeudeEditorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.gebaeude.versichertegebaeude.editor.IMbVersichertegebaeudeEditorView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.gebaeude.versichertesgebaeude.MbVersichertesGebaeudeView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.gebaeude.versichertesgebaeude.IMbVersichertesGebaeudeView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.gebaeude.versicherungsumfang.MbVersicherungsumfangView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.gebaeude.versicherungsumfang.IMbVersicherungsumfangView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifkonfiguration.bhv.MbBhvTarifkonfigurationView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifkonfiguration.bhv.IMbBhvTarifkonfigurationView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifkonfiguration.gebaeude.MbGebaeudeTarifkonfigurationView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifkonfiguration.gebaeude.IMbGebaeudeTarifkonfigurationView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifkonfiguration.inhalt.MbInhaltTarifkonfigurationView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifkonfiguration.inhalt.IMbInhaltTarifkonfigurationView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifkonfiguration.gesamtbeitrag.MbGesamtBeitragView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifkonfiguration.gesamtbeitrag.IMbGesamtBeitragView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.inhalt.angaben.MbAngabenView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.inhalt.angaben.IMbAngabenView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.inhalt.versicherungsumfang.MbVersicherungsumfangView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.inhalt.versicherungsumfang.IMbVersicherungsumfangView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.inhalt.versicherungsumfang.editor.RisikoOrtAuswahlEditorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.inhalt.versicherungsumfang.editor.IRiskoOrtAuswahlEditorView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.stichworte.MbStichworteView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.stichworte.IMbStichworteView"/>-->
+  <!--</replace-with>-->
+
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.zeichnung.dummy.MbDummyView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.zeichnung.dummy.IMbDummyView"/>-->
+  <!--</replace-with>-->
+
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.zeichnung.begruendung.MbBegruendungView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.zeichnung.begruendung.IMbBegruendungView"/>-->
+  <!--</replace-with>-->
+
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.risikofragen.MbRisikofragenView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.risikofragen.IMbRisikofragenView"/>-->
+  <!--</replace-with>-->
+
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.editors.view.RisikofrageEditorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.editors.presenter.IRisikofrageEditorView"/>-->
+  <!--</replace-with>-->
+
+  <!--&lt;!&ndash; Editoren - Business                                                   &ndash;&gt;-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.editors.view.TaetigkeitEditorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.editors.presenter.ITaetigkeitEditorView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.editors.view.ElementarProduktAuswahlEditorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.editors.presenter.IElementarProduktAuswahlEditorView"/>-->
+  <!--</replace-with>-->
+
+
+
+  <!--&lt;!&ndash; Desktop                                                    &ndash;&gt;-->
+  <!--&lt;!&ndash; Modul Core                                                 &ndash;&gt;-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.abschluss.beratungsprotokoll.MbBeratungsprotokollView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.abschluss.beratungsprotokoll.IMbBeratungsprotokollView"/>-->
+  <!--</replace-with>-->
+
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.abschluss.druckstuecke.MbDruckstueckeView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.abschluss.druckstuecke.IMbDruckstueckeView"/>-->
+  <!--</replace-with>-->
+
+  <!--&lt;!&ndash;   <replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.gebaeude.versichertesgebaeude.editor.MbGebauedeTaetigkeitenEditorView"> &ndash;&gt;-->
+  <!--&lt;!&ndash;     <when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.gebaeude.versichertesgebaeude.editor.IMbGebauedeTaetigkeitenEditorView"/> &ndash;&gt;-->
+  <!--&lt;!&ndash;   </replace-with> &ndash;&gt;-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.antragsfragen.vorversicherung.MbVorversicherungView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.antragsfragen.vorversicherung.IMbVorversicherungView"/>-->
+  <!--</replace-with>-->
+  <!--<replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.antragsfragen.vorversicherung.editor.MbVorversicherungEditorView">-->
+    <!--<when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.antragsfragen.vorversicherung.editor.IMbVorversicherungEditorView"/>-->
+  <!--</replace-with>-->
+
+  <!--&lt;!&ndash;   <replace-with class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.view.tarifangaben.gebaeude.versicherungsumfang.editor.MbAbsicherungenAuswahlEditorView"> &ndash;&gt;-->
+  <!--&lt;!&ndash;     <when-type-is class="de.gothaer.gwt.taa.gewerbe.client.ui.business.modulbox.presenter.tarifangaben.gebaeude.versicherungsumfang.editor.IMbAbsicherungenAuswahlEditorView"/> &ndash;&gt;-->
+  <!--&lt;!&ndash;   </replace-with> &ndash;&gt;-->
+
+  <!--&lt;!&ndash; permutation management &ndash;&gt;-->
+  <!--&lt;!&ndash; merge ie9 and ie10 into one permutation with a wildcard &ndash;&gt;-->
+  <!--<collapse-property name="gxt.user.agent" values="ie*"/>-->
+  <!--&lt;!&ndash; merge all operating system permutations &ndash;&gt;-->
+  <!--<collapse-property name="user.agent.os" values="*"/>-->
+  <!--&lt;!&ndash; merge all divices into one permutation&ndash;&gt;-->
+  <!--<collapse-property name="gxt.device" values="*" />-->
+
+  <!--&lt;!&ndash; Avoiding problems with GSS implementation &ndash;&gt;-->
+  <!--<set-configuration-property name="CssResource.legacy" value="true"/>-->
+</module>
