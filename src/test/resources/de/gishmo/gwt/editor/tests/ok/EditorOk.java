@@ -1,17 +1,15 @@
 package de.gishmo.gwt.editor.tests.ok;
 
+import java.util.Date;
+
 import com.google.gwt.editor.client.Editor;
-import com.google.gwt.editor.client.Editor.Path;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.datepicker.client.DateBox;
 
 import de.gishmo.gwt.editor.client.annotation.IsEditor;
 import de.gishmo.gwt.editor.tests.Address;
 import de.gishmo.gwt.editor.tests.Person;
-
-import java.util.Date;
-import com.google.gwt.user.datepicker.client.DateBox;
-
 
 @IsEditor(Person.class)
 public class EditorOk

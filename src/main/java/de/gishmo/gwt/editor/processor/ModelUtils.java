@@ -128,8 +128,8 @@ public class ModelUtils {
     Optional<? extends TypeMirror> optinals = element.getInterfaces()
                                                      .stream()
                                                      .filter(interfaceType -> ClassName.get(types.erasure(interfaceType))
-                                                                                      .toString()
-                                                                                      .contains(clazz.getCanonicalName()))
+                                                                                       .toString()
+                                                                                       .contains(clazz.getCanonicalName()))
                                                      .findFirst();
     if (optinals.isPresent()) {
       return optinals.get();

@@ -116,7 +116,8 @@ public class EditorProcessingStep
 
     FieldSpec objectField = FieldSpec.builder(editorModel.getDataTypeAsClassName(),
                                               "object",
-                                              Modifier.PRIVATE).build();
+                                              Modifier.PRIVATE)
+                                     .build();
     typeSpec.addField(objectField);
 
     typeSpec.addMethod(MethodSpec.methodBuilder("getEditor")
@@ -166,8 +167,8 @@ public class EditorProcessingStep
                                  .build());
 
     ParameterSpec visitorParameter = ParameterSpec.builder(EditorVisitor.class,
-                                                          "visitor")
-                                                 .build();
+                                                           "visitor")
+                                                  .build();
     typeSpec.addMethod(MethodSpec.methodBuilder("accept")
                                  .addAnnotation(Override.class)
                                  .addModifiers(Modifier.PUBLIC)
