@@ -16,6 +16,8 @@
 
 package de.gishmo.gwt.editor.tests.ok;
 
+import javax.tools.JavaFileObject;
+
 import org.junit.Test;
 
 import com.google.testing.compile.JavaFileObjects;
@@ -29,14 +31,16 @@ public class EditorOkTest {
 
   @Test
   public void EditorOkTest() {
-//    JavaFileObject editorOkImplObject = JavaFileObjects.forResource("de/gishmo/gwt/editor/tests/ok/EditorOkImpl.java");
+    JavaFileObject ValueBoxEditor_java_lang_String_SimpleBeanEditorDelegate_Object = JavaFileObjects.forResource("com/google/gwt/editor/ui/client/adapters/ValueBoxEditor_java_lang_String_SimpleBeanEditorDelegate.java");
+    JavaFileObject LeafValueEditor_java_util_Date_SimpleBeanEditorDelegate_Object  = JavaFileObjects.forResource("com/google/gwt/editor/client/LeafValueEditor_java_util_Date_SimpleBeanEditorDelegate.java");
 
     ASSERT.about(javaSource())
           .that(JavaFileObjects.forResource("de/gishmo/gwt/editor/tests/ok/EditorOk.java"))
           .processedWith(new EditorProcessor())
-          .compilesWithoutError();
-//          .and()
-//          .generatesSources(editorOkImplObject);
+          .compilesWithoutError()
+          .and()
+          .generatesSources(ValueBoxEditor_java_lang_String_SimpleBeanEditorDelegate_Object,
+                            LeafValueEditor_java_util_Date_SimpleBeanEditorDelegate_Object);
   }
 
   @Test

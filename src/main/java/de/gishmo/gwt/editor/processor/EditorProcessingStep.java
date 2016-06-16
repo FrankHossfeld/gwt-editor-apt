@@ -8,13 +8,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -26,7 +27,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.Editor.Ignore;
-import com.google.gwt.editor.client.Editor.Path;
 import com.google.gwt.editor.client.EditorVisitor;
 import com.google.gwt.editor.client.impl.AbstractEditorContext;
 import com.google.gwt.editor.client.impl.SimpleBeanEditorDelegate;
@@ -87,22 +87,22 @@ public class EditorProcessingStep
   }
 
   private void generate(EditorProcessingContext context) {
+    // create SimpleBeanEditorDelegates
     context.getEditorModels()
            .stream()
            .forEach(editorModel -> generateEditorClass(editorModel));
-//    context.getVariableElementList()
-//           .stream()
-//           .forEach(varibaleElement -> generateEditorClass(varibaleElement));
-//    context.getVariableElementList()
-//           .stream()
-//           .forEach(varibaleElement -> generateEditorContextClass(context,
-//                                                                  varibaleElement));
+    // create Context
+    context.getEditorModels()
+           .stream()
+           .forEach(editorModel -> generateEditorContextClass(context,
+                                                              editorModel));
   }
 
   private void generateEditorClass(EditorModel editorModel) {
     // check weather we did already generate the class
-//    if (variableElement)
-    // name of editor context
+    if (alreadyGeneratedEditorDelegates.contains(editorModel.getEditorName())) {
+      return;
+    }
 
     TypeSpec.Builder typeSpec = TypeSpec.classBuilder(editorModel.getEditorName())
                                         .addModifiers(Modifier.PUBLIC)
@@ -180,17 +180,16 @@ public class EditorProcessingStep
                                          typeSpec.build())
                                 .build();
     System.out.println(javaFile.toString());
-//    try {
-//      javaFile.writeTo(filer);
-//    } catch (IOException e) {
-//      // todo error handling
-//      e.printStackTrace();
-//      messager.printMessage(Diagnostic.Kind.ERROR,
-//                            String.format("%s applied on a type that doesn't implement %s; ignoring.",
-//                                          IsEditor.class.getCanonicalName(),
-//                                          Editor.class.getCanonicalName()));
-//    }
-
+    try {
+      javaFile.writeTo(filer);
+      // add file name to the list of already generated files to avoid a second generation
+      alreadyGeneratedEditorDelegates.add(editorModel.getEditorName());
+    } catch (IOException e) {
+      e.printStackTrace();
+      messager.printMessage(Diagnostic.Kind.ERROR,
+                            String.format("Error generating source file for type: " + MoreElements.getPackage(editorModel.getEditorTypeElement())
+                                                                                                  .toString() + editorModel.getEditorName()));
+    }
   }
 
   /**
@@ -199,41 +198,20 @@ public class EditorProcessingStep
    * for a {@code PersonEditor} and the EditorData for a {@code AddressEditor}
    * nested in the {@code PersonEditor}, create an EditorContext that will
    * describe the relationship.</p>
-   *
-   * @param context
-   * @param varibaleElement
    */
   private void generateEditorContextClass(EditorProcessingContext context,
-                                          VariableElement varibaleElement) {
-    // @Ignore ==> noting to do ToDo raus
-    if (context.getModelElement()
-               .getAnnotation(Ignore.class) != null) {
+                                          EditorModel editorModel) {
+    // @Ignore ==> noting to do to do here ... leave
+    if (editorModel.getModelElement()
+                   .getAnnotation(Ignore.class) != null) {
       return;
     }
-    // attribute name
-    String attributeName;
-    // todo ist falsch ...
-    Path pathAnotation = varibaleElement.getAnnotation(Path.class);
-    if (pathAnotation != null) {
-      attributeName = pathAnotation.value();
-    } else {
-      attributeName = varibaleElement.getSimpleName()
-                                     .toString();
-    }
-
-    // name of editor context
-    StringJoiner stringJoiner = new StringJoiner("");
-    stringJoiner.add(context.getSimpleName())
-                .add("_")
-                .add(attributeName.replace(".",
-                                           "_"))
-                .add("_Context");
-
-    TypeElement returnType = context.getModelReturnTypeForAttribute(attributeName);
+    // ToDo
+    TypeElement returnType = context.getModelReturnTypeForAttribute(editorModel.getAttibuteName());
     if (returnType == null) {
       return;
     }
-    TypeSpec.Builder typeSpec = TypeSpec.classBuilder(stringJoiner.toString())
+    TypeSpec.Builder typeSpec = TypeSpec.classBuilder(editorModel.getContextName())
                                         .addModifiers(Modifier.PUBLIC)
                                         .superclass(ParameterizedTypeName.get(ClassName.get(AbstractEditorContext.class),
                                                                               ClassName.get(MoreElements.getPackage(returnType)
@@ -260,7 +238,7 @@ public class EditorProcessingStep
                                                                                    "parent")
                                                                           .build())
                                                .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(Editor.class),
-                                                                                                             ClassName.get(context.getModelReturnTypeForAttribute(attributeName))),
+                                                                                                             ClassName.get(context.getModelReturnTypeForAttribute(editorModel.getAttibuteName()))),
                                                                                    "editor")
                                                                           .build())
                                                .addParameter(ClassName.get(String.class),
@@ -269,22 +247,22 @@ public class EditorProcessingStep
     constructor.addStatement("this.parent = parent");
     typeSpec.addMethod(constructor.build());
 
-    typeSpec.addMethod(MethodSpec.methodBuilder("canSetInModel")
-                                 .addAnnotation(Override.class)
-                                 .addModifiers(Modifier.PUBLIC)
-                                 .returns(ClassName.get(Boolean.class))
-                                 .addStatement(createCanSetInModelStatement(context,
-                                                                            attributeName))
-                                 .build());
+//    typeSpec.addMethod(MethodSpec.methodBuilder("canSetInModel")
+//                                 .addAnnotation(Override.class)
+//                                 .addModifiers(Modifier.PUBLIC)
+//                                 .returns(ClassName.get(Boolean.class))
+//                                 .addStatement(createCanSetInModelStatement(context,
+//                                                                            attributeName))
+//                                 .build());
 
     typeSpec.addMethod(MethodSpec.methodBuilder("checkAssignment")
                                  .addAnnotation(Override.class)
                                  .addModifiers(Modifier.PUBLIC)
                                  .addParameter(ClassName.get(Object.class),
                                                "value")
-                                 .returns(ClassName.get(context.getModelReturnTypeForAttribute(attributeName)))
+                                 .returns(ClassName.get(context.getModelReturnTypeForAttribute(editorModel.getAttibuteName())))
                                  .addStatement("return ($T) value",
-                                               ClassName.get(context.getModelReturnTypeForAttribute(attributeName)))
+                                               ClassName.get(context.getModelReturnTypeForAttribute(editorModel.getAttibuteName())))
                                  .build());
 
     typeSpec.addMethod(MethodSpec.methodBuilder("getEditedType")
@@ -292,10 +270,41 @@ public class EditorProcessingStep
                                  .addModifiers(Modifier.PUBLIC)
                                  .returns(ClassName.get(Class.class))
                                  .addStatement("return $T.class",
-                                               ClassName.get(context.getModelReturnTypeForAttribute(attributeName)))
+                                               ClassName.get(context.getModelReturnTypeForAttribute(editorModel.getAttibuteName())))
                                  .build());
 
-    JavaFile javaFile = JavaFile.builder(MoreElements.getPackage(context.getModelElement())
+    StringJoiner stringJoiner = new StringJoiner("");
+    stringJoiner.add("parent.");
+    System.out.println(editorModel.getPath());
+    if (editorModel.getPath()
+                   .indexOf(".") > 0) {
+      Pattern.compile(Pattern.quote("."))
+             .splitAsStream(editorModel.getPath())
+             .collect(Collectors.toList())
+             .forEach(attribute -> {
+               String lastAttribute = editorModel.getPath()
+                                                 .substring(editorModel.getPath()
+                                                                       .lastIndexOf(".") + 1);
+               if (lastAttribute.equals(attribute)) {
+                 stringJoiner.add(createSetterMethodName(attribute));
+               } else {
+                 stringJoiner.add(createGetterMethodName(attribute))
+                             .add("().");
+               }
+             });
+    } else {
+      stringJoiner.add(createSetterMethodName(editorModel.getPath()));
+    }
+    stringJoiner.add("(data)");
+    typeSpec.addMethod(MethodSpec.methodBuilder("setInModel")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PUBLIC)
+                                 .addParameter(ClassName.get(context.getModelReturnTypeForAttribute(editorModel.getAttibuteName())),
+                                               "data")
+                                 .addStatement(stringJoiner.toString())
+                                 .build());
+
+    JavaFile javaFile = JavaFile.builder(MoreElements.getPackage(editorModel.getModelElement())
                                                      .toString(),
                                          typeSpec.build())
                                 .build();
@@ -303,13 +312,33 @@ public class EditorProcessingStep
     try {
       javaFile.writeTo(filer);
     } catch (IOException e) {
-      // todo error handling
       e.printStackTrace();
       messager.printMessage(Diagnostic.Kind.ERROR,
-                            String.format("%s applied on a type that doesn't implement %s; ignoring.",
-                                          IsEditor.class.getCanonicalName(),
-                                          Editor.class.getCanonicalName()));
+                            String.format("Error generating source file for type: " + MoreElements.getPackage(editorModel.getEditorTypeElement())
+                                                                                                  .toString() + editorModel.getContextName()));
     }
+  }
+
+  private String createSetterMethodName(String path) {
+    return createGetterSetterMethodName("set",
+                                        path);
+  }
+
+  private String createGetterMethodName(String path) {
+    return createGetterSetterMethodName("get",
+                                        path);
+  }
+
+  private String createGetterSetterMethodName(String prefix,
+                                              String path) {
+    String name = path;
+    if (name.indexOf(".") > 0) {
+      name = path.substring(name.indexOf(".") - 1);
+    }
+    name = prefix + name.substring(0,
+                                   1)
+                        .toUpperCase() + name.substring(1);
+    return name;
   }
 
   private String createCanSetInModelStatement(EditorProcessingContext context,

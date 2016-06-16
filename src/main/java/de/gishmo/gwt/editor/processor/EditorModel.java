@@ -13,6 +13,7 @@ import javax.tools.Diagnostic.Kind;
 import com.google.auto.common.MoreElements;
 import com.google.auto.common.MoreTypes;
 import com.google.common.collect.ImmutableSet;
+import com.google.gwt.editor.client.Editor.Path;
 import com.squareup.javapoet.ClassName;
 
 public class EditorModel {
@@ -82,17 +83,37 @@ public class EditorModel {
                                                .toString());
   }
 
-//  public VariableElement getVariableElement() {
-//    return variableElement;
-//  }
-//
-//  public TypeElement getParent() {
-//    return parent;
-//  }
-//
-//  public String getPath() {
-//    return path;
-//  }
+  public TypeElement getModelElement() {
+    return modelElement;
+  }
+
+  public String getContextName() {
+    StringJoiner stringJoiner = new StringJoiner("");
+    return stringJoiner.add(parent.getSimpleName())
+                       .add("_")
+                       .add(getAttibuteName().replace(".",
+                                                      "_"))
+                       .add("_Context")
+                       .toString();
+  }
+
+  public String getAttibuteName() {
+    String attributeName;
+
+    Path pathAnotation = this.variableElement.getAnnotation(Path.class);
+    if (pathAnotation != null) {
+      attributeName = pathAnotation.value();
+    } else {
+      attributeName = variableElement.getSimpleName()
+                                     .toString();
+    }
+
+    return attributeName;
+  }
+
+  public String getPath() {
+    return path;
+  }
 
   private EditorModel setUp() {
     // check getter Method
@@ -159,25 +180,6 @@ public class EditorModel {
       this.setterMethod = null;
     }
     return this;
-  }
-
-  private String createGetterMethodName() {
-    return createGetterSetterMethodName("get");
-  }
-
-  private String createGetterSetterMethodName(String prefix) {
-    String name = path;
-    if (name.indexOf(".") > 0) {
-      name = path.substring(name.indexOf(".") - 1);
-    }
-    name = prefix + name.substring(0,
-                                   1)
-                        .toUpperCase() + name.substring(1);
-    return name;
-  }
-
-  private String createSetterMethodName() {
-    return createGetterSetterMethodName("set");
   }
 
   public static final class Builder {

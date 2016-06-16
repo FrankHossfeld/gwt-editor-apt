@@ -91,7 +91,7 @@ class EditorProcessingContext {
 
   private TypeElement getModelReturnTypeForAttribute(TypeElement model,
                                                      String attribute) {
-    // TODO ... woher wissen wir, dass das Feld genauiso heisst wie die Setter.Methode
+    // TODO ... woher wissen wir, dass das Feld genauso heisst wie die Setter.Methode
     // TODO bei address.street, erst mal das Street-Model holen .....
     if (attribute.contains(".")) {
       String parentAttribute = attribute.substring(0,
@@ -181,13 +181,6 @@ class EditorProcessingContext {
                                                                          .messenger(messager)
                                                                          .types(types)
                                                                          .build()));
-
-//    this.variableElementList.stream()
-//                            .forEach(type -> editorElementList.add((TypeElement) MoreTypes.asDeclared(type.asType())
-//                                                                                          .asElement()));
-//    this.editorElementList = this.editorElementList.parallelStream()
-//                                                   .distinct()
-//                                                   .collect(Collectors.toList());
     return this;
   }
 
