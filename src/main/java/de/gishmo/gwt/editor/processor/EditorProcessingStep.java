@@ -247,13 +247,13 @@ public class EditorProcessingStep
     constructor.addStatement("this.parent = parent");
     typeSpec.addMethod(constructor.build());
 
-//    typeSpec.addMethod(MethodSpec.methodBuilder("canSetInModel")
-//                                 .addAnnotation(Override.class)
-//                                 .addModifiers(Modifier.PUBLIC)
-//                                 .returns(ClassName.get(Boolean.class))
+    typeSpec.addMethod(MethodSpec.methodBuilder("canSetInModel")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PUBLIC)
+                                 .returns(ClassName.get(boolean.class))
 //                                 .addStatement(createCanSetInModelStatement(context,
 //                                                                            attributeName))
-//                                 .build());
+                                 .build());
 
     typeSpec.addMethod(MethodSpec.methodBuilder("checkAssignment")
                                  .addAnnotation(Override.class)
