@@ -41,7 +41,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import de.gishmo.gwt.editor.client.annotation.IsEditor;
 
-public class EditorProcessingStep
+class EditorProcessingStep
   implements ProcessingStep {
 
   private Messager messager;
@@ -90,7 +90,7 @@ public class EditorProcessingStep
     // create SimpleBeanEditorDelegates
     context.getEditorModels()
            .stream()
-           .forEach(editorModel -> generateEditorClass(editorModel));
+           .forEach(this::generateEditorClass);
     // create Context
     context.getEditorModels()
            .stream()
@@ -191,8 +191,8 @@ public class EditorProcessingStep
     } catch (IOException e) {
       e.printStackTrace();
       messager.printMessage(Diagnostic.Kind.ERROR,
-                            String.format("Error generating source file for type: " + MoreElements.getPackage(editorModel.getEditorTypeElement())
-                                                                                                  .toString() + editorModel.getEditorSimpleName()));
+                            "Error generating source file for type: " + MoreElements.getPackage(editorModel.getEditorTypeElement())
+                                                                                    .toString() + editorModel.getEditorSimpleName());
     }
   }
 
@@ -373,8 +373,7 @@ public class EditorProcessingStep
                                  .addStatement(sj05.toString())
                                  .build());
 
-    JavaFile javaFile = JavaFile.builder(context.getPackageName()
-                                                .toString(),
+    JavaFile javaFile = JavaFile.builder(context.getPackageName(),
                                          typeSpec.build())
                                 .build();
     System.out.println(javaFile.toString());
@@ -383,8 +382,8 @@ public class EditorProcessingStep
     } catch (IOException e) {
       e.printStackTrace();
       messager.printMessage(Diagnostic.Kind.ERROR,
-                            String.format("Error generating source file for type: " + MoreElements.getPackage(editorModel.getEditorTypeElement())
-                                                                                                  .toString() + editorModel.getContextName()));
+                            "Error generating source file for type: " + MoreElements.getPackage(editorModel.getEditorTypeElement())
+                                                                                    .toString() + editorModel.getContextName());
     }
   }
 
@@ -445,11 +444,9 @@ public class EditorProcessingStep
 
     context.getEditorModels()
            .stream()
-           .forEach(editorModel -> {
-             typeSpec.addField(FieldSpec.builder(SimpleBeanEditorDelegate.class,
-                                                 editorModel.getSimpleAttibuteName() + "Delegate")
-                                        .build());
-           });
+           .forEach(editorModel -> typeSpec.addField(FieldSpec.builder(SimpleBeanEditorDelegate.class,
+                                                                       editorModel.getSimpleAttibuteName() + "Delegate")
+                                                              .build()));
 
     MethodSpec.Builder initlializeSubDelegatesMethod = MethodSpec.methodBuilder("initlializeSubDelegates")
                                                                  .addAnnotation(Override.class)
@@ -499,8 +496,7 @@ public class EditorProcessingStep
            });
     typeSpec.addMethod(acceptMethod.build());
 
-    JavaFile javaFile = JavaFile.builder(context.getPackageName()
-                                                .toString(),
+    JavaFile javaFile = JavaFile.builder(context.getPackageName(),
                                          typeSpec.build())
                                 .build();
     System.out.println(javaFile.toString());
@@ -509,8 +505,7 @@ public class EditorProcessingStep
     } catch (IOException e) {
       e.printStackTrace();
       messager.printMessage(Diagnostic.Kind.ERROR,
-                            String.format("Error generating source file for type: " + context.getPackageName()
-                                                                                             .toString() + "." + context.getSimpleName() + "_SimpleBeanEditorDelegate"));
+                            "Error generating source file for type: " + context.getPackageName() + "." + context.getSimpleName() + "_SimpleBeanEditorDelegate");
     }
   }
 
@@ -520,15 +515,7 @@ public class EditorProcessingStep
                                                              .toString() + "EditorDriverImpl")
                                         .addModifiers(Modifier.PUBLIC);
 
-
-
-
-
-
-
-
-    JavaFile javaFile = JavaFile.builder(context.getPackageName()
-                                                .toString(),
+    JavaFile javaFile = JavaFile.builder(context.getPackageName(),
                                          typeSpec.build())
                                 .build();
     System.out.println(javaFile.toString());
@@ -537,9 +524,9 @@ public class EditorProcessingStep
     } catch (IOException e) {
       e.printStackTrace();
       messager.printMessage(Diagnostic.Kind.ERROR,
-                            String.format("Error generating source file for type: " + context.getElement()
-                                                                                             .getSimpleName()
-                                                                                             .toString() + "EditorDriverImpl"));
+                            "Error generating source file for type: " + context.getElement()
+                                                                               .getSimpleName()
+                                                                               .toString() + "EditorDriverImpl");
     }
   }
 
