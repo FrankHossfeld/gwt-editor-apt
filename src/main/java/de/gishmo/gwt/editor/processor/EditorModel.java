@@ -52,7 +52,7 @@ public class EditorModel {
     return new EditorModel.Builder();
   }
 
-  public String getEditorName() {
+  public String getEditorSimpleName() {
     StringJoiner stringJoiner = new StringJoiner("");
     stringJoiner.add(this.editorTypeElement.getSimpleName()
                                            .toString())
@@ -109,6 +109,12 @@ public class EditorModel {
     }
 
     return attributeName;
+  }
+
+  public String getSimpleAttibuteName() {
+    return getAttibuteName().indexOf(".") > 0 ?
+           getAttibuteName().substring(getAttibuteName().indexOf(".") + 1) :
+           getAttibuteName();
   }
 
   public String getPath() {

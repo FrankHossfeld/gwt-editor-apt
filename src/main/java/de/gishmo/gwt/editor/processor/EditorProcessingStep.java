@@ -96,15 +96,19 @@ public class EditorProcessingStep
            .stream()
            .forEach(editorModel -> generateEditorContextClass(context,
                                                               editorModel));
+    // create SimpleBeanEditorDelegate
+    generateSimpleBeanEditorDelegateClass(context);
+    // create implementation
+    generateImplClass(context);
   }
 
   private void generateEditorClass(EditorModel editorModel) {
     // check weather we did already generate the class
-    if (alreadyGeneratedEditorDelegates.contains(editorModel.getEditorName())) {
+    if (alreadyGeneratedEditorDelegates.contains(editorModel.getEditorSimpleName())) {
       return;
     }
 
-    TypeSpec.Builder typeSpec = TypeSpec.classBuilder(editorModel.getEditorName())
+    TypeSpec.Builder typeSpec = TypeSpec.classBuilder(editorModel.getEditorSimpleName())
                                         .addModifiers(Modifier.PUBLIC)
                                         .superclass(ClassName.get(SimpleBeanEditorDelegate.class));
 
@@ -183,18 +187,18 @@ public class EditorProcessingStep
     try {
       javaFile.writeTo(filer);
       // add file name to the list of already generated files to avoid a second generation
-      alreadyGeneratedEditorDelegates.add(editorModel.getEditorName());
+      alreadyGeneratedEditorDelegates.add(editorModel.getEditorSimpleName());
     } catch (IOException e) {
       e.printStackTrace();
       messager.printMessage(Diagnostic.Kind.ERROR,
                             String.format("Error generating source file for type: " + MoreElements.getPackage(editorModel.getEditorTypeElement())
-                                                                                                  .toString() + editorModel.getEditorName()));
+                                                                                                  .toString() + editorModel.getEditorSimpleName()));
     }
   }
 
   /**
    * <p>Create an EditorContext implementation that will provide access to
-   * data owned by arent. In other words, given the EditorData
+   * data owned by parent. In other words, given the EditorData
    * for a {@code PersonEditor} and the EditorData for a {@code AddressEditor}
    * nested in the {@code PersonEditor}, create an EditorContext that will
    * describe the relationship.</p>
@@ -247,13 +251,37 @@ public class EditorProcessingStep
     constructor.addStatement("this.parent = parent");
     typeSpec.addMethod(constructor.build());
 
-//    typeSpec.addMethod(MethodSpec.methodBuilder("canSetInModel")
-//                                 .addAnnotation(Override.class)
-//                                 .addModifiers(Modifier.PUBLIC)
-//                                 .returns(ClassName.get(Boolean.class))
-//                                 .addStatement(createCanSetInModelStatement(context,
-//                                                                            attributeName))
-//                                 .build());
+    StringJoiner sj01 = new StringJoiner("");
+    sj01.add("return parent != null");
+    StringJoiner sj02 = new StringJoiner("");
+    sj02.add("parent");
+    if (editorModel.getPath()
+                   .indexOf(".") > 0) {
+      Pattern.compile(Pattern.quote("."))
+             .splitAsStream(editorModel.getPath())
+             .collect(Collectors.toList())
+             .forEach(attribute -> {
+               String lastAttribute = editorModel.getPath()
+                                                 .substring(editorModel.getPath()
+                                                                       .lastIndexOf(".") + 1);
+               if (!lastAttribute.equals(attribute)) {
+                 sj02.add(".")
+                     .add(createGetterMethodName(attribute))
+                     .add("()");
+                 sj01.add(" && ")
+                     .add(sj02.toString())
+                     .add(" != null");
+               }
+             });
+    }
+    typeSpec.addMethod(MethodSpec.methodBuilder("canSetInModel")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PUBLIC)
+                                 .returns(boolean.class)
+                                 .addParameter(ClassName.get(context.getModelReturnTypeForAttribute(editorModel.getAttibuteName())),
+                                               "data")
+                                 .addStatement(sj01.toString())
+                                 .build());
 
     typeSpec.addMethod(MethodSpec.methodBuilder("checkAssignment")
                                  .addAnnotation(Override.class)
@@ -273,9 +301,10 @@ public class EditorProcessingStep
                                                ClassName.get(context.getModelReturnTypeForAttribute(editorModel.getAttibuteName())))
                                  .build());
 
-    StringJoiner stringJoiner = new StringJoiner("");
-    stringJoiner.add("parent.");
-    System.out.println(editorModel.getPath());
+    StringJoiner sj06 = new StringJoiner("");
+    sj06.add("return (parent != null");
+    StringJoiner sj04 = new StringJoiner("");
+    sj04.add("parent");
     if (editorModel.getPath()
                    .indexOf(".") > 0) {
       Pattern.compile(Pattern.quote("."))
@@ -286,26 +315,66 @@ public class EditorProcessingStep
                                                  .substring(editorModel.getPath()
                                                                        .lastIndexOf(".") + 1);
                if (lastAttribute.equals(attribute)) {
-                 stringJoiner.add(createSetterMethodName(attribute));
+                 sj04.add(".")
+                     .add(createGetterMethodName(attribute))
+                     .add("()");
                } else {
-                 stringJoiner.add(createGetterMethodName(attribute))
-                             .add("().");
+                 sj04.add(".")
+                     .add(createGetterMethodName(attribute))
+                     .add("()");
+                 sj06.add(" && ")
+                     .add(sj04.toString())
+                     .add(" != null");
+
+               }
+             });
+      sj06.add(") ? ")
+          .add(sj04.toString())
+          .add(" : null");
+    } else {
+      sj06.add(") ? ")
+          .add(createGetterMethodName(editorModel.getPath()))
+          .add(" : null");
+    }
+    typeSpec.addMethod(MethodSpec.methodBuilder("getFromModel")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PUBLIC)
+                                 .returns(ClassName.get(context.getModelReturnTypeForAttribute(editorModel.getAttibuteName())))
+                                 .addStatement(sj06.toString())
+                                 .build());
+
+    StringJoiner sj05 = new StringJoiner("");
+    sj05.add("parent.");
+    if (editorModel.getPath()
+                   .indexOf(".") > 0) {
+      Pattern.compile(Pattern.quote("."))
+             .splitAsStream(editorModel.getPath())
+             .collect(Collectors.toList())
+             .forEach(attribute -> {
+               String lastAttribute = editorModel.getPath()
+                                                 .substring(editorModel.getPath()
+                                                                       .lastIndexOf(".") + 1);
+               if (lastAttribute.equals(attribute)) {
+                 sj05.add(createSetterMethodName(attribute));
+               } else {
+                 sj05.add(createGetterMethodName(attribute))
+                     .add("().");
                }
              });
     } else {
-      stringJoiner.add(createSetterMethodName(editorModel.getPath()));
+      sj05.add(createSetterMethodName(editorModel.getPath()));
     }
-    stringJoiner.add("(data)");
+    sj05.add("(data)");
     typeSpec.addMethod(MethodSpec.methodBuilder("setInModel")
                                  .addAnnotation(Override.class)
                                  .addModifiers(Modifier.PUBLIC)
                                  .addParameter(ClassName.get(context.getModelReturnTypeForAttribute(editorModel.getAttibuteName())),
                                                "data")
-                                 .addStatement(stringJoiner.toString())
+                                 .addStatement(sj05.toString())
                                  .build());
 
-    JavaFile javaFile = JavaFile.builder(MoreElements.getPackage(editorModel.getModelElement())
-                                                     .toString(),
+    JavaFile javaFile = JavaFile.builder(context.getPackageName()
+                                                .toString(),
                                          typeSpec.build())
                                 .build();
     System.out.println(javaFile.toString());
@@ -319,13 +388,168 @@ public class EditorProcessingStep
     }
   }
 
-  private String createSetterMethodName(String path) {
-    return createGetterSetterMethodName("set",
-                                        path);
+  private void generateSimpleBeanEditorDelegateClass(EditorProcessingContext context) {
+    TypeSpec.Builder typeSpec = TypeSpec.classBuilder(context.getSimpleName() + "_SimpleBeanEditorDelegate")
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .superclass(ClassName.get(SimpleBeanEditorDelegate.class));
+    FieldSpec editorField = FieldSpec.builder(TypeName.get(context.getElement()
+                                                                  .asType()),
+                                              "editor")
+                                     .addModifiers(Modifier.PRIVATE)
+                                     .build();
+    typeSpec.addField(editorField);
+
+    FieldSpec objectField = FieldSpec.builder(TypeName.get(context.getModelElement()
+                                                                  .asType()),
+                                              "object")
+                                     .addModifiers(Modifier.PRIVATE)
+                                     .build();
+    typeSpec.addField(objectField);
+
+    typeSpec.addMethod(MethodSpec.methodBuilder("getEditor")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PROTECTED)
+                                 .returns(TypeName.get(context.getElement()
+                                                              .asType()))
+                                 .addStatement("return editor")
+                                 .build());
+
+    typeSpec.addMethod(MethodSpec.methodBuilder("setEditor")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PROTECTED)
+                                 .addParameter(Editor.class,
+                                               "editor")
+                                 .addStatement("this.editor = ($T) editor",
+                                               TypeName.get(context.getElement()
+                                                                   .asType()))
+                                 .build());
+
+    typeSpec.addMethod(MethodSpec.methodBuilder("getObject")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PUBLIC)
+                                 .returns(TypeName.get(context.getModelElement()
+                                                              .asType()))
+                                 .addStatement("return object")
+                                 .build());
+
+    typeSpec.addMethod(MethodSpec.methodBuilder("setObject")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PROTECTED)
+                                 .addParameter(TypeName.get(context.getModelElement()
+                                                                   .asType()),
+                                               "object")
+                                 .addStatement("this.object = ($T) object",
+                                               TypeName.get(context.getModelElement()
+                                                                   .asType()))
+                                 .build());
+
+    context.getEditorModels()
+           .stream()
+           .forEach(editorModel -> {
+             typeSpec.addField(FieldSpec.builder(SimpleBeanEditorDelegate.class,
+                                                 editorModel.getSimpleAttibuteName() + "Delegate")
+                                        .build());
+           });
+
+    MethodSpec.Builder initlializeSubDelegatesMethod = MethodSpec.methodBuilder("initlializeSubDelegates")
+                                                                 .addAnnotation(Override.class)
+                                                                 .addModifiers(Modifier.PROTECTED);
+    context.getEditorModels()
+           .stream()
+           .forEach(editorModel -> {
+             initlializeSubDelegatesMethod.beginControlFlow("if (editor.$L.asEditor() != null)",
+                                                            editorModel.getSimpleAttibuteName());
+             initlializeSubDelegatesMethod.addStatement("$LDelegate = new $T()",
+                                                        editorModel.getSimpleAttibuteName(),
+                                                        ClassName.get(MoreElements.getPackage(editorModel.getEditorTypeElement())
+                                                                                  .toString(),
+                                                                      editorModel.getEditorSimpleName()));
+             initlializeSubDelegatesMethod.addStatement("addSubDelegate($LDelegate, appendPath($S), editor.$L.asEditor())",
+                                                        editorModel.getSimpleAttibuteName(),
+                                                        editorModel.getSimpleAttibuteName(),
+                                                        editorModel.getSimpleAttibuteName());
+             initlializeSubDelegatesMethod.endControlFlow();
+           });
+    typeSpec.addMethod(initlializeSubDelegatesMethod.build());
+
+    MethodSpec.Builder acceptMethod = MethodSpec.methodBuilder("accept")
+                                                .addAnnotation(Override.class)
+                                                .addModifiers(Modifier.PUBLIC)
+                                                .addParameter(TypeName.get(EditorVisitor.class),
+                                                              "visitor");
+    context.getEditorModels()
+           .stream()
+           .forEach(editorModel -> {
+             acceptMethod.beginControlFlow("if ($LDelegate != null)",
+                                           editorModel.getSimpleAttibuteName());
+             acceptMethod.addStatement("$T ctx = new $T(getObject(), editor.$L.asEditor(), appendPath($S))",
+                                       ClassName.get(MoreElements.getPackage(editorModel.getEditorTypeElement())
+                                                                 .toString(),
+                                                     editorModel.getContextName()),
+                                       ClassName.get(MoreElements.getPackage(editorModel.getEditorTypeElement())
+                                                                 .toString(),
+                                                     editorModel.getContextName()),
+                                       editorModel.getSimpleAttibuteName(),
+                                       editorModel.getSimpleAttibuteName());
+             acceptMethod.addStatement("ctx.setEditorDelegate($LDelegate)",
+                                       editorModel.getSimpleAttibuteName());
+             acceptMethod.addStatement("ctx.traverse(visitor, $LDelegate)",
+                                       editorModel.getSimpleAttibuteName());
+             acceptMethod.endControlFlow();
+           });
+    typeSpec.addMethod(acceptMethod.build());
+
+    JavaFile javaFile = JavaFile.builder(context.getPackageName()
+                                                .toString(),
+                                         typeSpec.build())
+                                .build();
+    System.out.println(javaFile.toString());
+    try {
+      javaFile.writeTo(filer);
+    } catch (IOException e) {
+      e.printStackTrace();
+      messager.printMessage(Diagnostic.Kind.ERROR,
+                            String.format("Error generating source file for type: " + context.getPackageName()
+                                                                                             .toString() + "." + context.getSimpleName() + "_SimpleBeanEditorDelegate"));
+    }
+  }
+
+  private void generateImplClass(EditorProcessingContext context) {
+    TypeSpec.Builder typeSpec = TypeSpec.classBuilder(context.getElement()
+                                                             .getSimpleName()
+                                                             .toString() + "EditorDriverImpl")
+                                        .addModifiers(Modifier.PUBLIC);
+
+
+
+
+
+
+
+
+    JavaFile javaFile = JavaFile.builder(context.getPackageName()
+                                                .toString(),
+                                         typeSpec.build())
+                                .build();
+    System.out.println(javaFile.toString());
+    try {
+      javaFile.writeTo(filer);
+    } catch (IOException e) {
+      e.printStackTrace();
+      messager.printMessage(Diagnostic.Kind.ERROR,
+                            String.format("Error generating source file for type: " + context.getElement()
+                                                                                             .getSimpleName()
+                                                                                             .toString() + "EditorDriverImpl"));
+    }
   }
 
   private String createGetterMethodName(String path) {
     return createGetterSetterMethodName("get",
+                                        path);
+  }
+
+  private String createSetterMethodName(String path) {
+    return createGetterSetterMethodName("set",
                                         path);
   }
 
