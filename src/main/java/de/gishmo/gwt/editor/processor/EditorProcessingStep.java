@@ -5,7 +5,6 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
@@ -16,7 +15,6 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
@@ -28,7 +26,10 @@ import com.google.common.collect.SetMultimap;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.Editor.Ignore;
 import com.google.gwt.editor.client.EditorVisitor;
+import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.editor.client.impl.AbstractEditorContext;
+import com.google.gwt.editor.client.impl.AbstractSimpleBeanEditorDriver;
+import com.google.gwt.editor.client.impl.RootEditorContext;
 import com.google.gwt.editor.client.impl.SimpleBeanEditorDelegate;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -100,100 +101,6 @@ class EditorProcessingStep
     generateSimpleBeanEditorDelegateClass(context);
     // create implementation
     generateImplClass(context);
-  }
-
-  private void generateEditorClass(EditorModel editorModel) {
-    // check weather we did already generate the class
-    if (alreadyGeneratedEditorDelegates.contains(editorModel.getEditorSimpleName())) {
-      return;
-    }
-
-    TypeSpec.Builder typeSpec = TypeSpec.classBuilder(editorModel.getEditorSimpleName())
-                                        .addModifiers(Modifier.PUBLIC)
-                                        .superclass(ClassName.get(SimpleBeanEditorDelegate.class));
-
-    FieldSpec editorField = FieldSpec.builder(editorModel.getEditorTypeAsClassName(),
-                                              "editor",
-                                              Modifier.PRIVATE)
-                                     .build();
-    typeSpec.addField(editorField);
-
-    FieldSpec objectField = FieldSpec.builder(editorModel.getDataTypeAsClassName(),
-                                              "object",
-                                              Modifier.PRIVATE)
-                                     .build();
-    typeSpec.addField(objectField);
-
-    typeSpec.addMethod(MethodSpec.methodBuilder("getEditor")
-                                 .returns(editorModel.getEditorTypeAsClassName())
-                                 .addAnnotation(Override.class)
-                                 .addModifiers(Modifier.PROTECTED)
-                                 .addStatement("return $N",
-                                               editorField)
-                                 .build());
-
-    ParameterSpec editorParameter = ParameterSpec.builder(Editor.class,
-                                                          "editor")
-                                                 .build();
-    typeSpec.addMethod(MethodSpec.methodBuilder("setEditor")
-                                 .addParameter(editorParameter)
-                                 .addStatement("this.$N = ($T) $N",
-                                               editorField,
-                                               editorModel.getEditorTypeAsClassName(),
-                                               editorParameter)
-                                 .addModifiers(Modifier.PROTECTED)
-                                 .build());
-
-    typeSpec.addMethod(MethodSpec.methodBuilder("getObject")
-                                 .addAnnotation(Override.class)
-                                 .addModifiers(Modifier.PUBLIC)
-                                 .returns(editorModel.getDataTypeAsClassName())
-                                 .addStatement("return $N",
-                                               objectField)
-                                 .build());
-
-    ParameterSpec objectParameter = ParameterSpec.builder(Object.class,
-                                                          "object")
-                                                 .build();
-    typeSpec.addMethod(MethodSpec.methodBuilder("setObject")
-                                 .addAnnotation(Override.class)
-                                 .addModifiers(Modifier.PROTECTED)
-                                 .addParameter(objectParameter)
-                                 .addStatement("this.$N = ($T) $N",
-                                               objectField,
-                                               editorModel.getDataTypeAsClassName(),
-                                               objectParameter)
-                                 .build());
-
-    typeSpec.addMethod(MethodSpec.methodBuilder("initializeSubDelegates")
-                                 .addAnnotation(Override.class)
-                                 .addModifiers(Modifier.PROTECTED)
-                                 .build());
-
-    ParameterSpec visitorParameter = ParameterSpec.builder(EditorVisitor.class,
-                                                           "visitor")
-                                                  .build();
-    typeSpec.addMethod(MethodSpec.methodBuilder("accept")
-                                 .addAnnotation(Override.class)
-                                 .addModifiers(Modifier.PUBLIC)
-                                 .addParameter(visitorParameter)
-                                 .build());
-
-    JavaFile javaFile = JavaFile.builder(MoreElements.getPackage(editorModel.getEditorTypeElement())
-                                                     .toString(),
-                                         typeSpec.build())
-                                .build();
-    System.out.println(javaFile.toString());
-    try {
-      javaFile.writeTo(filer);
-      // add file name to the list of already generated files to avoid a second generation
-      alreadyGeneratedEditorDelegates.add(editorModel.getEditorSimpleName());
-    } catch (IOException e) {
-      e.printStackTrace();
-      messager.printMessage(Diagnostic.Kind.ERROR,
-                            "Error generating source file for type: " + MoreElements.getPackage(editorModel.getEditorTypeElement())
-                                                                                    .toString() + editorModel.getEditorSimpleName());
-    }
   }
 
   /**
@@ -278,8 +185,6 @@ class EditorProcessingStep
                                  .addAnnotation(Override.class)
                                  .addModifiers(Modifier.PUBLIC)
                                  .returns(boolean.class)
-                                 .addParameter(ClassName.get(context.getModelReturnTypeForAttribute(editorModel.getAttibuteName())),
-                                               "data")
                                  .addStatement(sj01.toString())
                                  .build());
 
@@ -333,8 +238,10 @@ class EditorProcessingStep
           .add(" : null");
     } else {
       sj06.add(") ? ")
+          .add(sj04.toString())
+          .add(".")
           .add(createGetterMethodName(editorModel.getPath()))
-          .add(" : null");
+          .add("() : null");
     }
     typeSpec.addMethod(MethodSpec.methodBuilder("getFromModel")
                                  .addAnnotation(Override.class)
@@ -434,8 +341,7 @@ class EditorProcessingStep
     typeSpec.addMethod(MethodSpec.methodBuilder("setObject")
                                  .addAnnotation(Override.class)
                                  .addModifiers(Modifier.PROTECTED)
-                                 .addParameter(TypeName.get(context.getModelElement()
-                                                                   .asType()),
+                                 .addParameter(Object.class,
                                                "object")
                                  .addStatement("this.object = ($T) object",
                                                TypeName.get(context.getModelElement()
@@ -448,23 +354,22 @@ class EditorProcessingStep
                                                                        editorModel.getSimpleAttibuteName() + "Delegate")
                                                               .build()));
 
-    MethodSpec.Builder initlializeSubDelegatesMethod = MethodSpec.methodBuilder("initlializeSubDelegates")
+    MethodSpec.Builder initlializeSubDelegatesMethod = MethodSpec.methodBuilder("initializeSubDelegates")
                                                                  .addAnnotation(Override.class)
                                                                  .addModifiers(Modifier.PROTECTED);
     context.getEditorModels()
            .stream()
            .forEach(editorModel -> {
              initlializeSubDelegatesMethod.beginControlFlow("if (editor.$L.asEditor() != null)",
-                                                            editorModel.getSimpleAttibuteName());
+                                                            editorModel.getSimpleEditorAttibuteName());
              initlializeSubDelegatesMethod.addStatement("$LDelegate = new $T()",
                                                         editorModel.getSimpleAttibuteName(),
-                                                        ClassName.get(MoreElements.getPackage(editorModel.getEditorTypeElement())
-                                                                                  .toString(),
-                                                                      editorModel.getEditorSimpleName()));
+                                                        ClassName.get(MoreElements.getPackage(editorModel.getEditorTypeElement()).toString(),
+                                                                      editorModel.getEditorTypeSimpleName()));
              initlializeSubDelegatesMethod.addStatement("addSubDelegate($LDelegate, appendPath($S), editor.$L.asEditor())",
                                                         editorModel.getSimpleAttibuteName(),
                                                         editorModel.getSimpleAttibuteName(),
-                                                        editorModel.getSimpleAttibuteName());
+                                                        editorModel.getSimpleEditorAttibuteName());
              initlializeSubDelegatesMethod.endControlFlow();
            });
     typeSpec.addMethod(initlializeSubDelegatesMethod.build());
@@ -480,13 +385,11 @@ class EditorProcessingStep
              acceptMethod.beginControlFlow("if ($LDelegate != null)",
                                            editorModel.getSimpleAttibuteName());
              acceptMethod.addStatement("$T ctx = new $T(getObject(), editor.$L.asEditor(), appendPath($S))",
-                                       ClassName.get(MoreElements.getPackage(editorModel.getEditorTypeElement())
-                                                                 .toString(),
+                                       ClassName.get(context.getPackageName(),
                                                      editorModel.getContextName()),
-                                       ClassName.get(MoreElements.getPackage(editorModel.getEditorTypeElement())
-                                                                 .toString(),
+                                       ClassName.get(context.getPackageName(),
                                                      editorModel.getContextName()),
-                                       editorModel.getSimpleAttibuteName(),
+                                       editorModel.getSimpleEditorAttibuteName(),
                                        editorModel.getSimpleAttibuteName());
              acceptMethod.addStatement("ctx.setEditorDelegate($LDelegate)",
                                        editorModel.getSimpleAttibuteName());
@@ -513,7 +416,38 @@ class EditorProcessingStep
     TypeSpec.Builder typeSpec = TypeSpec.classBuilder(context.getElement()
                                                              .getSimpleName()
                                                              .toString() + "EditorDriverImpl")
-                                        .addModifiers(Modifier.PUBLIC);
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .superclass(ParameterizedTypeName.get(ClassName.get(AbstractSimpleBeanEditorDriver.class),
+                                                                              ClassName.get(context.getModelElement()),
+                                                                              ClassName.get((TypeElement) context.getElement())))
+                                        .addSuperinterface(ParameterizedTypeName.get(ClassName.get(SimpleBeanEditorDriver.class),
+                                                                                     ClassName.get(context.getModelElement()),
+                                                                                     ClassName.get((TypeElement) context.getElement())));
+
+    ParameterSpec visitorParameter = ParameterSpec.builder(ClassName.get(EditorVisitor.class),
+                                                           "visitor")
+                                                  .build();
+    typeSpec.addMethod(MethodSpec.methodBuilder("accept")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PUBLIC)
+                                 .returns(void.class)
+                                 .addParameter(visitorParameter)
+                                 .addStatement("$T ctx = new $T(getDelegate(), $T.class, getObject())",
+                                               ClassName.get(RootEditorContext.class),
+                                               ClassName.get(RootEditorContext.class),
+                                               ClassName.get(context.getModelElement()))
+                                 .addStatement("ctx.traverse($N, getDelegate())",
+                                               visitorParameter)
+                                 .build());
+
+    typeSpec.addMethod(MethodSpec.methodBuilder("createDelegate")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PROTECTED)
+                                 .returns(SimpleBeanEditorDelegate.class)
+                                 .addStatement("return new $T()",
+                                               ClassName.get(context.getPackageName(),
+                                                             context.getSimpleName() + "_SimpleBeanEditorDelegate"))
+                                 .build());
 
     JavaFile javaFile = JavaFile.builder(context.getPackageName(),
                                          typeSpec.build())
@@ -552,26 +486,97 @@ class EditorProcessingStep
     return name;
   }
 
-  private String createCanSetInModelStatement(EditorProcessingContext context,
-                                              String attributeName) {
-    String statement = "parent != null &&";
+  private void generateEditorClass(EditorModel editorModel) {
+    // check weather we did already generate the class
+    if (alreadyGeneratedEditorDelegates.contains(editorModel.getEditorTypeSimpleName())) {
+      return;
+    }
 
-    return statement;
-  }
+    TypeSpec.Builder typeSpec = TypeSpec.classBuilder(editorModel.getEditorTypeSimpleName())
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .superclass(ClassName.get(SimpleBeanEditorDelegate.class));
 
-  private TypeMirror getInterfaceType(TypeElement element,
-                                      Class<?> clazz) {
-    Optional<? extends TypeMirror> optinals = element.getInterfaces()
-                                                     .stream()
-                                                     .filter(interfaeType -> ClassName.get(types.erasure(interfaeType))
-                                                                                      .toString()
-                                                                                      .contains(clazz.getCanonicalName()))
-                                                     .findFirst();
-    if (optinals.isPresent()) {
-      return optinals.get();
-    } else {
-      return getInterfaceType((TypeElement) types.asElement(element.getSuperclass()),
-                              clazz);
+    FieldSpec editorField = FieldSpec.builder(editorModel.getEditorTypeAsClassName(),
+                                              "editor",
+                                              Modifier.PRIVATE)
+                                     .build();
+    typeSpec.addField(editorField);
+
+    FieldSpec objectField = FieldSpec.builder(editorModel.getDataTypeAsClassName(),
+                                              "object",
+                                              Modifier.PRIVATE)
+                                     .build();
+    typeSpec.addField(objectField);
+
+    typeSpec.addMethod(MethodSpec.methodBuilder("getEditor")
+                                 .returns(editorModel.getEditorTypeAsClassName())
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PROTECTED)
+                                 .addStatement("return $N",
+                                               editorField)
+                                 .build());
+
+    ParameterSpec editorParameter = ParameterSpec.builder(Editor.class,
+                                                          "editor")
+                                                 .build();
+    typeSpec.addMethod(MethodSpec.methodBuilder("setEditor")
+                                 .addParameter(editorParameter)
+                                 .addStatement("this.$N = ($T) $N",
+                                               editorField,
+                                               editorModel.getEditorTypeAsClassName(),
+                                               editorParameter)
+                                 .addModifiers(Modifier.PROTECTED)
+                                 .build());
+
+    typeSpec.addMethod(MethodSpec.methodBuilder("getObject")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PUBLIC)
+                                 .returns(editorModel.getDataTypeAsClassName())
+                                 .addStatement("return $N",
+                                               objectField)
+                                 .build());
+
+    ParameterSpec objectParameter = ParameterSpec.builder(Object.class,
+                                                          "object")
+                                                 .build();
+    typeSpec.addMethod(MethodSpec.methodBuilder("setObject")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PROTECTED)
+                                 .addParameter(objectParameter)
+                                 .addStatement("this.$N = ($T) $N",
+                                               objectField,
+                                               editorModel.getDataTypeAsClassName(),
+                                               objectParameter)
+                                 .build());
+
+    typeSpec.addMethod(MethodSpec.methodBuilder("initializeSubDelegates")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PROTECTED)
+                                 .build());
+
+    ParameterSpec visitorParameter = ParameterSpec.builder(EditorVisitor.class,
+                                                           "visitor")
+                                                  .build();
+    typeSpec.addMethod(MethodSpec.methodBuilder("accept")
+                                 .addAnnotation(Override.class)
+                                 .addModifiers(Modifier.PUBLIC)
+                                 .addParameter(visitorParameter)
+                                 .build());
+
+    JavaFile javaFile = JavaFile.builder(MoreElements.getPackage(editorModel.getEditorTypeElement())
+                                                     .toString(),
+                                         typeSpec.build())
+                                .build();
+    System.out.println(javaFile.toString());
+    try {
+      javaFile.writeTo(filer);
+      // add file name to the list of already generated files to avoid a second generation
+      alreadyGeneratedEditorDelegates.add(editorModel.getEditorTypeSimpleName());
+    } catch (IOException e) {
+      e.printStackTrace();
+      messager.printMessage(Diagnostic.Kind.ERROR,
+                            "Error generating source file for type: " + MoreElements.getPackage(editorModel.getEditorTypeElement())
+                                                                                    .toString() + editorModel.getEditorTypeSimpleName());
     }
   }
 

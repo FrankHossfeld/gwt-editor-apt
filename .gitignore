@@ -1,3 +1,7 @@
+# IntelliJ project files
+.idea
+*.iml
+
 *.class
 
 # Mobile Tools for Java (J2ME)
@@ -8,16 +12,9 @@
 *.war
 *.ear
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-target/classes/de/gishmo/gwt/editor/Editor-APT.gwt.xml
-target/classes/de/gishmo/gwt/editor/client/annotation/IsEditor.java
-target/classes/de/gishmo/gwt/editor/processor/EditorModel.java
-target/classes/de/gishmo/gwt/editor/processor/EditorProcessingContext.java
-target/classes/de/gishmo/gwt/editor/processor/EditorProcessingStep.java
-target/classes/de/gishmo/gwt/editor/processor/EditorProcessor.java
-target/classes/de/gishmo/gwt/editor/processor/ModelUtils.java
-target/classes/META-INF/services/javax.annotation.processing.Processor
-target/test-classes/de/gishmo/gwt/editor/tests/Address.java
-target/test-classes/de/gishmo/gwt/editor/tests/Person.java
-target/test-classes/de/gishmo/gwt/editor/tests/ok/EditorOk.java
+out
+gen
+target
+.idea/
+src/it/
+target/

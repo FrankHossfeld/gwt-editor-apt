@@ -61,6 +61,7 @@
     <junit.version>4.12</junit.version>
     <google.truth.version>0.28</google.truth.version>
     <org.truth.version>0.23</org.truth.version>
+    <validation-api.version>1.1.0.Final</validation-api.version>
   </properties>
 
   <dependencyManagement>
@@ -108,6 +109,11 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>${validation-api.version}</version>
+    </dependency>
     <!--<dependency>-->
       <!--<groupId>com.squareup</groupId>-->
       <!--<artifactId>javapoet</artifactId>-->
@@ -124,12 +130,6 @@
       <version>${compile.testing.version}</version>
       <scope>test</scope>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>com.google.truth</groupId>-->
-      <!--<artifactId>truth</artifactId>-->
-      <!--<version>${google.truth.version}</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
     <dependency>
       <groupId>org.truth0</groupId>
       <artifactId>truth</artifactId>
