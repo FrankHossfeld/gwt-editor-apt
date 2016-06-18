@@ -1,13 +1,13 @@
-package de.gishmo.gwt.editor.ok;
+package tests.EditorOK.test.de.gishmo.gwt.editor.ok;
 
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorVisitor;
 import com.google.gwt.editor.client.LeafValueEditor_java_util_Date_SimpleBeanEditorDelegate;
 import com.google.gwt.editor.client.impl.SimpleBeanEditorDelegate;
 import com.google.gwt.editor.ui.client.adapters.ValueBoxEditor_java_lang_String_SimpleBeanEditorDelegate;
-import de.gishmo.gwt.editor.tests.Person;
 import java.lang.Object;
 import java.lang.Override;
+import tests.EditorOK.test.de.gishmo.gwt.editor.Person;
 
 public class EditorOk_SimpleBeanEditorDelegate extends SimpleBeanEditorDelegate {
   private EditorOk editor;

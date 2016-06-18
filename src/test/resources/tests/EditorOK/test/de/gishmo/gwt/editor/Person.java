@@ -1,4 +1,4 @@
-package de.gishmo.gwt.editor;
+package tests.EditorOK.test.de.gishmo.gwt.editor;
 
 import java.util.Date;
 
