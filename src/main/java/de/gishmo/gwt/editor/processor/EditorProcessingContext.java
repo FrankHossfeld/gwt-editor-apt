@@ -168,9 +168,6 @@ class EditorProcessingContext {
     if (!types.isAssignable(element.asType(),
                             types.erasure(requireType(elements,
                                                       SimpleBeanEditorDriver.class).asType()))) {
-      System.out.println(element.asType().toString());
-      System.out.println(types.erasure(requireType(elements,
-                                                   SimpleBeanEditorDriver.class).asType()));
       messager.printMessage(Diagnostic.Kind.ERROR,
                             String.format("%s applied on a type that doesn't implement %s; ignoring. hoss 01",
                                           IsEditor.class.getCanonicalName(),
