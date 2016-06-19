@@ -107,15 +107,15 @@ public class ModelUtils {
                                                                     .stream()
                                                                     .filter(executebleElement -> executebleElement.getSimpleName()
                                                                                                                   .toString()
-                                                                                                                  .equals("get" + ModelUtils.capatilize(path.substring(0,
+                                                                                                                  .equals("set" + ModelUtils.capatilize(path.substring(0,
                                                                                                                                                                        path.indexOf(".")))))
                                                                     .findFirst();
       if (optional.isPresent()) {
-        ExecutableElement executableElement = optional.get();
-        return ModelUtils.findGetMethod((TypeElement) MoreTypes.asDeclared(optional.get()
-                                                                                   .getReturnType())
-                                                               .asElement(),
-                                        path.substring(path.indexOf(".") + 1));
+        return optional.get();
+//        return ModelUtils.findSetMethod((TypeElement) MoreTypes.asDeclared(optional.get()
+//                                                                                   .getReturnType())
+//                                                               .asElement(),
+//                                        path.substring(path.indexOf(".") + 1));
       } else {
         return null;
       }
