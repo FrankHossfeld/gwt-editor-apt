@@ -20,12 +20,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import de.gishmo.gwt.editor.tests.ok.EditorOkTest;
+import de.gishmo.gwt.editor.tests.ok.EditorOkTwoPackagesTest;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({
-                      EditorOkTest.class,
-//                      DebugTest.class,
+@Suite.SuiteClasses({ EditorOkTest.class,
+                      EditorOkTwoPackagesTest.class
 //                      EventBusTest.class
-})
+                    })
 public class AllTests {
 }

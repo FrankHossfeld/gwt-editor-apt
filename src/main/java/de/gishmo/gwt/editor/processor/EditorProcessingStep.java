@@ -26,7 +26,6 @@ import com.google.common.collect.SetMultimap;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.Editor.Ignore;
 import com.google.gwt.editor.client.EditorVisitor;
-import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.editor.client.impl.AbstractEditorContext;
 import com.google.gwt.editor.client.impl.AbstractSimpleBeanEditorDriver;
 import com.google.gwt.editor.client.impl.RootEditorContext;
@@ -280,10 +279,10 @@ class EditorProcessingStep
                                  .addStatement(sj05.toString())
                                  .build());
 
-    JavaFile javaFile = JavaFile.builder(context.getPackageName(),
+    JavaFile javaFile = JavaFile.builder(context.getEditorPackageName(),
                                          typeSpec.build())
                                 .build();
-    System.out.println(javaFile.toString());
+//    System.out.println(javaFile.toString());
     try {
       javaFile.writeTo(filer);
     } catch (IOException e) {
@@ -295,10 +294,10 @@ class EditorProcessingStep
   }
 
   private void generateSimpleBeanEditorDelegateClass(EditorProcessingContext context) {
-    TypeSpec.Builder typeSpec = TypeSpec.classBuilder(context.getSimpleName() + "_SimpleBeanEditorDelegate")
+    TypeSpec.Builder typeSpec = TypeSpec.classBuilder(context.getEditorSimpleName() + "_SimpleBeanEditorDelegate")
                                         .addModifiers(Modifier.PUBLIC)
                                         .superclass(ClassName.get(SimpleBeanEditorDelegate.class));
-    FieldSpec editorField = FieldSpec.builder(TypeName.get(context.getElement()
+    FieldSpec editorField = FieldSpec.builder(TypeName.get(context.getEditorElement()
                                                                   .asType()),
                                               "editor")
                                      .addModifiers(Modifier.PRIVATE)
@@ -315,7 +314,7 @@ class EditorProcessingStep
     typeSpec.addMethod(MethodSpec.methodBuilder("getEditor")
                                  .addAnnotation(Override.class)
                                  .addModifiers(Modifier.PROTECTED)
-                                 .returns(TypeName.get(context.getElement()
+                                 .returns(TypeName.get(context.getEditorElement()
                                                               .asType()))
                                  .addStatement("return editor")
                                  .build());
@@ -326,7 +325,7 @@ class EditorProcessingStep
                                  .addParameter(Editor.class,
                                                "editor")
                                  .addStatement("this.editor = ($T) editor",
-                                               TypeName.get(context.getElement()
+                                               TypeName.get(context.getEditorElement()
                                                                    .asType()))
                                  .build());
 
@@ -364,7 +363,8 @@ class EditorProcessingStep
                                                             editorModel.getSimpleEditorAttibuteName());
              initlializeSubDelegatesMethod.addStatement("$LDelegate = new $T()",
                                                         editorModel.getSimpleAttibuteName(),
-                                                        ClassName.get(MoreElements.getPackage(editorModel.getEditorTypeElement()).toString(),
+                                                        ClassName.get(MoreElements.getPackage(editorModel.getEditorTypeElement())
+                                                                                  .toString(),
                                                                       editorModel.getEditorTypeSimpleName()));
              initlializeSubDelegatesMethod.addStatement("addSubDelegate($LDelegate, appendPath($S), editor.$L.asEditor())",
                                                         editorModel.getSimpleAttibuteName(),
@@ -385,9 +385,9 @@ class EditorProcessingStep
              acceptMethod.beginControlFlow("if ($LDelegate != null)",
                                            editorModel.getSimpleAttibuteName());
              acceptMethod.addStatement("$T ctx = new $T(getObject(), editor.$L.asEditor(), appendPath($S))",
-                                       ClassName.get(context.getPackageName(),
+                                       ClassName.get(context.getEditorPackageName(),
                                                      editorModel.getContextName()),
-                                       ClassName.get(context.getPackageName(),
+                                       ClassName.get(context.getEditorPackageName(),
                                                      editorModel.getContextName()),
                                        editorModel.getSimpleEditorAttibuteName(),
                                        editorModel.getSimpleAttibuteName());
@@ -399,30 +399,28 @@ class EditorProcessingStep
            });
     typeSpec.addMethod(acceptMethod.build());
 
-    JavaFile javaFile = JavaFile.builder(context.getPackageName(),
+    JavaFile javaFile = JavaFile.builder(context.getEditorPackageName(),
                                          typeSpec.build())
                                 .build();
-    System.out.println(javaFile.toString());
+//    System.out.println(javaFile.toString());
     try {
       javaFile.writeTo(filer);
     } catch (IOException e) {
       e.printStackTrace();
       messager.printMessage(Diagnostic.Kind.ERROR,
-                            "Error generating source file for type: " + context.getPackageName() + "." + context.getSimpleName() + "_SimpleBeanEditorDelegate");
+                            "Error generating source file for type: " + context.getConsumerPackageName() + "." + context.getConsumerSimpleName() + "_SimpleBeanEditorDelegate");
     }
   }
 
   private void generateImplClass(EditorProcessingContext context) {
     TypeSpec.Builder typeSpec = TypeSpec.classBuilder(context.getElement()
                                                              .getSimpleName()
-                                                             .toString() + "EditorDriverImpl")
+                                                             .toString() + "Impl")
                                         .addModifiers(Modifier.PUBLIC)
                                         .superclass(ParameterizedTypeName.get(ClassName.get(AbstractSimpleBeanEditorDriver.class),
                                                                               ClassName.get(context.getModelElement()),
-                                                                              ClassName.get((TypeElement) context.getElement())))
-                                        .addSuperinterface(ParameterizedTypeName.get(ClassName.get(SimpleBeanEditorDriver.class),
-                                                                                     ClassName.get(context.getModelElement()),
-                                                                                     ClassName.get((TypeElement) context.getElement())));
+                                                                              ClassName.get(context.getEditorElement())))
+                                        .addSuperinterface(ClassName.get((TypeElement) context.getElement()));
 
     ParameterSpec visitorParameter = ParameterSpec.builder(ClassName.get(EditorVisitor.class),
                                                            "visitor")
@@ -445,14 +443,14 @@ class EditorProcessingStep
                                  .addModifiers(Modifier.PROTECTED)
                                  .returns(SimpleBeanEditorDelegate.class)
                                  .addStatement("return new $T()",
-                                               ClassName.get(context.getPackageName(),
-                                                             context.getSimpleName() + "_SimpleBeanEditorDelegate"))
+                                               ClassName.get(context.getEditorPackageName(),
+                                                             context.getEditorSimpleName() + "_SimpleBeanEditorDelegate"))
                                  .build());
 
-    JavaFile javaFile = JavaFile.builder(context.getPackageName(),
+    JavaFile javaFile = JavaFile.builder(context.getConsumerPackageName(),
                                          typeSpec.build())
                                 .build();
-    System.out.println(javaFile.toString());
+//    System.out.println(javaFile.toString());
     try {
       javaFile.writeTo(filer);
     } catch (IOException e) {
@@ -567,7 +565,7 @@ class EditorProcessingStep
                                                      .toString(),
                                          typeSpec.build())
                                 .build();
-    System.out.println(javaFile.toString());
+//    System.out.println(javaFile.toString());
     try {
       javaFile.writeTo(filer);
       // add file name to the list of already generated files to avoid a second generation

@@ -12,7 +12,6 @@ import de.gishmo.gwt.editor.client.annotation.IsEditor;
 import tests.EditorOK.test.de.gishmo.gwt.editor.Address;
 import tests.EditorOK.test.de.gishmo.gwt.editor.Person;
 
-@IsEditor(Person.class)
 public class EditorOk
   implements Editor<Person> {
 
@@ -34,7 +33,7 @@ public class EditorOk
                                                  "xyz",
                                                  "Springfield"));
 
-  private SimpleBeanEditorDriver<Person, EditorOk> editorDriver;
+  private EditorOkEditorDriver editorDriver;
 
   public EditorOk() {
     editorDriver = new EditorOkEditorDriverImpl();
@@ -42,5 +41,10 @@ public class EditorOk
     editorDriver.edit(person);
 
     person = editorDriver.flush();
+  }
+
+  @IsEditor
+  interface EditorOkEditorDriver
+    extends SimpleBeanEditorDriver<Person, EditorOk> {
   }
 }

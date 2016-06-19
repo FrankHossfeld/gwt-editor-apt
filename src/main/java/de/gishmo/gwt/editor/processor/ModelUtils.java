@@ -19,7 +19,7 @@ public class ModelUtils {
 //    if (path.indexOf(".") == -1) {
 //      return ElementFilter.methodsIn(element.getEnclosedElements())
 //                          .stream()
-//                          .filter(executebleElement -> executebleElement.getSimpleName()
+//                          .filter(executebleElement -> executebleElement.getConsumerSimpleName()
 //                                                                        .toString()
 //                                                                        .equals(prefix + ModelUtils.capatilize(path)))
 //                          .findFirst()
@@ -30,7 +30,7 @@ public class ModelUtils {
 //      }
 //      Optional<? extends ExecutableElement> optional = ElementFilter.methodsIn(element.getEnclosedElements())
 //                                                                    .stream()
-//                                                                    .filter(executebleElement -> executebleElement.getSimpleName()
+//                                                                    .filter(executebleElement -> executebleElement.getConsumerSimpleName()
 //                                                                                                                  .toString()
 //                                                                                                                  .equals("get" + ModelUtils.capatilize(path.substring(0,
 //                                                                                                                                                                       path.indexOf(".")))))

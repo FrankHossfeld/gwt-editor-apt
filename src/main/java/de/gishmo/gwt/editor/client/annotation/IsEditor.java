@@ -6,12 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates the annotatedtype is an editor.
+ * Indicates the annotated type is an editor.
  */
 @Target({ ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IsEditor {
-
-  Class<?> value();
-
 }

@@ -11,7 +11,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -22,6 +22,7 @@ import com.google.auto.common.MoreTypes;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.Editor.Ignore;
 import com.google.gwt.editor.client.Editor.Path;
+import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.user.client.ui.HasValue;
 
 import de.gishmo.gwt.editor.client.annotation.IsEditor;
@@ -36,10 +37,16 @@ class EditorProcessingContext {
   private Elements elements;
   private Element  element;
 
-  private String            packageName;
-  private String            simpleName;
-  private String            simpleImplName;
+  private String            consumerPackageName;
+  private String            consumerSimpleName;
+  private String            consumerSimpleImplName;
+
+  private TypeElement       editorElement;
+  private String            editorPackageName;
+  private String            editorSimpleName;
   private TypeElement       modelElement;
+  private String            modelPackageName;
+  private String            modelSimpleName;
   private List<EditorModel> editorModels;
 
   private EditorProcessingContext(Builder builder) {
@@ -60,16 +67,28 @@ class EditorProcessingContext {
     return editorModels;
   }
 
-  public String getPackageName() {
-    return packageName;
+  public String getConsumerPackageName() {
+    return consumerPackageName;
   }
 
-  public String getSimpleName() {
-    return simpleName;
+  public String getConsumerSimpleName() {
+    return consumerSimpleName;
   }
 
-  public String getSimpleImplName() {
-    return simpleImplName;
+  public String getConsumerSimpleImplName() {
+    return consumerSimpleImplName;
+  }
+
+  public TypeElement getEditorElement() {
+    return editorElement;
+  }
+
+  public String getEditorPackageName() {
+    return editorPackageName;
+  }
+
+  public String getEditorSimpleName() {
+    return editorSimpleName;
   }
 
   public TypeElement getModelElement() {
@@ -144,39 +163,83 @@ class EditorProcessingContext {
   }
 
   private EditorProcessingContext create() {
-    this.packageName = MoreElements.getPackage(element)
-                                   .toString();
-    this.simpleName = element.getSimpleName()
-                             .toString();
-    this.simpleImplName = element.getSimpleName()
-                                 .toString() + EditorProcessingContext.IMPL_NAME;
-
+    // do some stuff with the consumer ...
+    // element is an interface
     if (!types.isAssignable(element.asType(),
+                            types.erasure(requireType(elements,
+                                                      SimpleBeanEditorDriver.class).asType()))) {
+      System.out.println(element.asType().toString());
+      System.out.println(types.erasure(requireType(elements,
+                                                   SimpleBeanEditorDriver.class).asType()));
+      messager.printMessage(Diagnostic.Kind.ERROR,
+                            String.format("%s applied on a type that doesn't implement %s; ignoring. hoss 01",
+                                          IsEditor.class.getCanonicalName(),
+                                          SimpleBeanEditorDriver.class.getCanonicalName()));
+      return null;
+    }
+    // element is extending SimpleBeanEditorDriver
+    if (!element.getKind()
+                .equals(ElementKind.INTERFACE)) {
+      messager.printMessage(Diagnostic.Kind.ERROR,
+                            String.format("%s applied on a type that is not an interface; ignoring.",
+                                          IsEditor.class.getCanonicalName()));
+      return null;
+    }
+    // two generic parameters are set
+    Optional<? extends TypeMirror> optional = types.directSupertypes(element.asType())
+                                                     .stream()
+                                                     .filter(superType -> types.isAssignable(superType,
+                                                                                             types.erasure(requireType(elements,
+                                                                                                                       SimpleBeanEditorDriver.class).asType())))
+                                                     .findFirst();
+    if (optional.isPresent()) {
+      TypeMirror superType = optional.get();
+      List<? extends TypeMirror> typeArguments = ((DeclaredType) superType).getTypeArguments();
+      if (typeArguments.size() != 2) {
+        messager.printMessage(Diagnostic.Kind.ERROR,
+                              String.format("%s has no type arguments; ignoring.",
+                                            SimpleBeanEditorDriver.class.getCanonicalName()));
+        return null;
+      }
+      this.modelElement = (TypeElement) MoreTypes.asElement(typeArguments.get(0));
+      this.editorElement = (TypeElement) MoreTypes.asElement(typeArguments.get(1));
+
+      this.modelPackageName = MoreElements.getPackage(modelElement)
+                                          .toString();
+      this.modelSimpleName = modelElement.getSimpleName()
+                                           .toString();
+
+      this.editorPackageName = MoreElements.getPackage(editorElement)
+                                           .toString();
+      this.editorSimpleName = editorElement.getSimpleName()
+                                           .toString();
+    }
+
+    this.consumerPackageName = MoreElements.getPackage(element)
+                                           .toString();
+    this.consumerSimpleName = element.getSimpleName()
+                                     .toString();
+    this.consumerSimpleImplName = element.getSimpleName()
+                                         .toString() + EditorProcessingContext.IMPL_NAME;
+
+    if (!types.isAssignable(editorElement.asType(),
                             types.erasure(requireType(elements,
                                                       Editor.class).asType()))) {
       messager.printMessage(Diagnostic.Kind.ERROR,
                             String.format("%s applied on a type that doesn't implement %s; ignoring.",
-                                          IsEditor.class.getCanonicalName(),
+                                          editorElement.getQualifiedName().toString(),
                                           Editor.class.getCanonicalName()));
       return null;
     }
 
-    IsEditor annotation = element.getAnnotation(IsEditor.class);
-    try {
-      Class<?> modelClazz = annotation.value();
-    } catch (MirroredTypeException e) {
-      DeclaredType classTypeMirror = (DeclaredType) e.getTypeMirror();
-      this.modelElement = (TypeElement) classTypeMirror.asElement();
-    }
-
-    ElementFilter.fieldsIn(element.getEnclosedElements())
+    ElementFilter.fieldsIn(editorElement.getEnclosedElements())
                  .stream()
                  .filter(variableElement -> isInstanceOfHasValue(variableElement))
                  .filter(variableElement -> variableElement.getAnnotation(Ignore.class) == null)
                  .forEach(variableElement -> editorModels.add(EditorModel.builder()
                                                                          .element(variableElement)
                                                                          .path(getPath(variableElement))
-                                                                         .parent((TypeElement) element)
+                                                                         .parent(editorElement)
                                                                          .modelElement(modelElement)
                                                                          .messenger(messager)
                                                                          .types(types)

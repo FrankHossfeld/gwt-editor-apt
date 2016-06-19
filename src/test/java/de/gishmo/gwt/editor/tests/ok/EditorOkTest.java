@@ -31,17 +31,17 @@ public class EditorOkTest {
 
   @Test
   public void EditorOkTest() {
-    JavaFileObject ValueBoxEditor_java_lang_String_SimpleBeanEditorDelegate_Object = JavaFileObjects.forResource("tests/EditorOK/results/com/google/gwt/editor/ui/client/adapters/ValueBoxEditor_java_lang_String_SimpleBeanEditorDelegate.java");
-    JavaFileObject LeafValueEditor_java_util_Date_SimpleBeanEditorDelegate_Object  = JavaFileObjects.forResource("tests/EditorOK/results/com/google/gwt/editor/client/LeafValueEditor_java_util_Date_SimpleBeanEditorDelegate.java");
+    JavaFileObject ValueBoxEditor_java_lang_String_SimpleBeanEditorDelegate_Object = JavaFileObjects.forResource("tests/EditorOK/expectedResults/com/google/gwt/editor/ui/client/adapters/ValueBoxEditor_java_lang_String_SimpleBeanEditorDelegate.java");
+    JavaFileObject LeafValueEditor_java_util_Date_SimpleBeanEditorDelegate_Object  = JavaFileObjects.forResource("tests/EditorOK/expectedResults/com/google/gwt/editor/client/LeafValueEditor_java_util_Date_SimpleBeanEditorDelegate.java");
 
-    JavaFileObject EditorOk_address_street_Context_Object = JavaFileObjects.forResource("tests/EditorOK/results/de/gishmo/gwt/editor/ok/EditorOk_address_street_Context.java");
-    JavaFileObject EditorOk_date_Context_Object           = JavaFileObjects.forResource("tests/EditorOK/results/de/gishmo/gwt/editor/ok/EditorOk_date_Context.java");
-    JavaFileObject EditorOk_firstName_Context_Object      = JavaFileObjects.forResource("tests/EditorOK/results/de/gishmo/gwt/editor/ok/EditorOk_firstName_Context.java");
-    JavaFileObject EditorOk_name_Context_Object           = JavaFileObjects.forResource("tests/EditorOK/results/de/gishmo/gwt/editor/ok/EditorOk_name_Context.java");
+    JavaFileObject EditorOk_address_street_Context_Object = JavaFileObjects.forResource("tests/EditorOK/expectedResults/de/gishmo/gwt/editor/ok/EditorOk_address_street_Context.java");
+    JavaFileObject EditorOk_date_Context_Object           = JavaFileObjects.forResource("tests/EditorOK/expectedResults/de/gishmo/gwt/editor/ok/EditorOk_date_Context.java");
+    JavaFileObject EditorOk_firstName_Context_Object      = JavaFileObjects.forResource("tests/EditorOK/expectedResults/de/gishmo/gwt/editor/ok/EditorOk_firstName_Context.java");
+    JavaFileObject EditorOk_name_Context_Object           = JavaFileObjects.forResource("tests/EditorOK/expectedResults/de/gishmo/gwt/editor/ok/EditorOk_name_Context.java");
 
-    JavaFileObject EditorOk_SimpleBeanEditorDelegate_Object = JavaFileObjects.forResource("tests/EditorOK/results/de/gishmo/gwt/editor/ok/EditorOk_SimpleBeanEditorDelegate.java");
+    JavaFileObject EditorOk_SimpleBeanEditorDelegate_Object = JavaFileObjects.forResource("tests/EditorOK/expectedResults/de/gishmo/gwt/editor/ok/EditorOk_SimpleBeanEditorDelegate.java");
 
-    JavaFileObject EditorOkEditorDriverImpl_Object = JavaFileObjects.forResource("tests/EditorOK/results/de/gishmo/gwt/editor/ok/EditorOkEditorDriverImpl.java");
+    JavaFileObject EditorOkEditorDriverImpl_Object = JavaFileObjects.forResource("tests/EditorOK/expectedResults/de/gishmo/gwt/editor/ok/EditorOkEditorDriverImpl.java");
 
     ASSERT.about(javaSource())
           .that(JavaFileObjects.forResource("tests/EditorOK/test/de/gishmo/gwt/editor/ok/EditorOk.java"))
@@ -56,26 +56,5 @@ public class EditorOkTest {
                             EditorOk_name_Context_Object,
                             EditorOk_SimpleBeanEditorDelegate_Object,
                             EditorOkEditorDriverImpl_Object);
-  }
-
-  @Test
-  public void ApplicationOKTest() {
-//    JavaFileObject applicationOKImplOKObject = JavaFileObjects.forResource("org/gwt4e/mvp4g/test/apt/application/ApplicationOK/expectedResults/ApplicationOKImpl.java");
-////    JavaFileObject applicationOKDaggerModuleObject = JavaFileObjects.forResource("org/gwt4e/mvp4g/test/apt/application/ApplicationOK/expectedResults/ApplicationDaggerModule.java");
-////    JavaFileObject applicationOKApplicationDaggerComponentObject = JavaFileObjects.forResource("org/gwt4e/mvp4g/test/apt/application/ApplicationOK/expectedResults/ApplicationDaggerComponent.java");
-////    JavaFileObject twoEventHandlerObject = JavaFileObjects.forResource("org/gwt4e/mvp4g/test/apt/eventbus/EventBusWithEvents/expectedResults/TwoEventMvp4gInternalEventHandler.java");
-////    JavaFileObject twoEventObject = JavaFileObjects.forResource("org/gwt4e/mvp4g/test/apt/eventbus/EventBusWithEvents/expectedResults/TwoEventMvp4gInternalEvent.java");
-////    JavaFileObject threeEventHandlerObject = JavaFileObjects.forResource("org/gwt4e/mvp4g/test/apt/eventbus/EventBusWithEvents/expectedResults/ThreeEventMvp4gInternalEventHandler.java");
-////    JavaFileObject threEveentObject = JavaFileObjects.forResource("org/gwt4e/mvp4g/test/apt/eventbus/EventBusWithEvents/expectedResults/ThreeEventMvp4gInternalEvent.java");
-//
-//    ASSERT.about(javaSource())
-//          .that(JavaFileObjects.forResource("org/gwt4e/mvp4g/test/apt/application/ApplicationOK/ApplicationOK.java"))
-//          .processedWith(new Processor())
-//          .compilesWithoutError()
-//          .and()
-//          .generatesSources(applicationOKImplOKObject);
-
-//          .failsToCompile()
-//          .withErrorContaining("Application applied on a type org.gwt4e.mvp4g.test.apt.application.ApplicationIsNotAnInterface that's not an interface; ignoring");
   }
 }
