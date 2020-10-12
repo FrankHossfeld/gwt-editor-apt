@@ -58,7 +58,7 @@
     <compile.testing.version>0.9</compile.testing.version>
     <gwt.version>2.7.0</gwt.version>
     <javapoet.version>1.4.0</javapoet.version>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
     <google.truth.version>0.28</google.truth.version>
     <org.truth.version>0.23</org.truth.version>
     <validation-api.version>1.1.0.Final</validation-api.version>
